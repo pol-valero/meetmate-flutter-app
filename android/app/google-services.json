@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "920907309027",
+    "project_id": "meetmatedb",
+    "storage_bucket": "meetmatedb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:920907309027:android:5903355fa129502a4c8ad6",
+        "android_client_info": {
+          "package_name": "com.example.meet_mate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSw4njnmsskloc4tYjg31A2QBEFPymewk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
