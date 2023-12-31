@@ -4,8 +4,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import '../components/buttons.dart';
+import '../components/text_fields.dart';
+import '../utils/utils.dart';
 
-//TODO: Do the class properly is only for testing purposes
+
 class TabProfileView extends StatefulWidget {
   final String uid;
   const TabProfileView({Key? key, required this.uid}) : super(key: key);
@@ -18,6 +22,7 @@ class TabProfileView extends StatefulWidget {
 class _TabProfileViewState extends State<TabProfileView> {
   final String uid;
   Image profileImage = Image.asset('assets/images/default_profile_image.png', height: 200, width: 200);
+  File? profileImageFile;
   String name = 'Name';
   String age = 'Age';
   var interestsField = TextEditingController();
@@ -32,13 +37,14 @@ class _TabProfileViewState extends State<TabProfileView> {
   @override
   void initState() {
     super.initState();
-      getProfileInfo();
+    getProfileInfo();
   }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffe87e70),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -51,17 +57,25 @@ class _TabProfileViewState extends State<TabProfileView> {
                 backgroundImage: profileImage.image,
               ),
               const SizedBox(height: 12),
-
-              // put a centered text Name - Age
-              Text(name + ' - ' + age, style:
-              const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-
-              const SizedBox(height: 8),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Interests',
-                  enabled: editable,
+              if (editable)
+                ImageButton(
+                  onPressed: () {
+                    if (!editable) {
+                      return;
+                    }
+                    pickImageClicked();
+                  },
                 ),
+                const SizedBox(height: 16),
+
+              Text('$name - $age', style:
+              const TextStyle(fontSize: 24, fontWeight: FontWeight.bold,
+                  color: Colors.white)),
+
+              const SizedBox(height: 16),
+              EditingTextField(
+                labelText: 'Interests',
+                enabled: editable,
                 controller: interestsField,
                 validator: (value) {
                   if (value!.isEmpty) {
@@ -70,14 +84,10 @@ class _TabProfileViewState extends State<TabProfileView> {
                   return null;
                 },
               ),
-              const SizedBox(height: 8),
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                decoration: InputDecoration(
-                  labelText: 'About Me',
-                  enabled: editable,
-                ),
+              const SizedBox(height: 16),
+              EditingTextField(
+                labelText: 'About Me',
+                enabled: editable,
                 controller: aboutMeField,
                 validator: (value) {
                   if (value!.isEmpty) {
@@ -85,29 +95,28 @@ class _TabProfileViewState extends State<TabProfileView> {
                   }
                   return null;
                 },
+                isMultiline: true,
               ),
               const SizedBox(height:32),
 
-              Container(
-                width: 200,
-                child: ElevatedButton(
+              MainButton(
                   onPressed: () {
-                    setState(() {
-                      if (editable) {
-                        saveProfileInfo();
-                      } else {
-                        editable = true;
-                        edit = 'Save';
-                      }
-                    });
+                    if (editable && formKey.currentState!.validate()) {
+                      saveProfileInfo();
+                    }
+                    if(formKey.currentState!.validate()){
+                      setState(() {
+                        editable = !editable;
+                        if (editable) {
+                          edit = 'Save';
+                        } else {
+                          edit = 'Edit';
+                        }
+                      });
+                    }
                   },
-                  child: Text(edit),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.grey[300],
-                  ),
-                ),
-              ),
+                  text: edit,
+              )
             ],
           ),
         ),
@@ -117,18 +126,18 @@ class _TabProfileViewState extends State<TabProfileView> {
   }
 
   void saveProfileInfo() async {
-    if (formKey.currentState!.validate()) {
-      // we need to save the interests controller and about me controller
-      FirebaseFirestore.instance.collection('users').doc(uid).update({
-        'interests': interestsField.text,
-        'about_me': aboutMeField.text,
-      }).then((value) {
-        setState(() {
-          editable = false;
-          edit = 'Edit';
-        });
+    FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'interests': interestsField.text,
+      'about_me': aboutMeField.text,
+    }).then((value) {
+      setState(() {
+        editable = false;
+        edit = 'Edit';
       });
-    }
+    });
+
+    FirebaseStorage.instance.ref('profile_images/$uid').putFile(File(profileImageFile!.path));
+
   }
 
 
@@ -149,5 +158,16 @@ class _TabProfileViewState extends State<TabProfileView> {
         profileImage = Image.network(value, height: 200, width: 200);
       });
     });
+  }
+
+
+  void pickImageClicked() async {
+    final pickedImage = await Utils.pickImage(context);
+    if (pickedImage != null) {
+      setState(() {
+        profileImageFile = File(pickedImage.path);
+        profileImage = Image.file(profileImageFile!, height: 200, width: 200);
+      });
+    }
   }
 }

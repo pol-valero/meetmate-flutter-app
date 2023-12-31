@@ -12,7 +12,7 @@ class TabManager extends StatefulWidget {
 }
 
 class _TabManagerState extends State<TabManager> {
-  int tabIndex = 0;
+  int tabIndex = 1;
   final String uid;
   late List<Widget> viewToLoad;
 
@@ -50,24 +50,4 @@ class _TabManagerState extends State<TabManager> {
       tabIndex = index;
     });
   }
-
-  /*Future<bool> _onWillPop() async {
-    return (await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Are you sure?'),
-        content: Text('Do you want to exit an App'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Yes'),
-          ),
-        ],
-      ),
-    )) ?? false;
-  }*/
 }

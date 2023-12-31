@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meet_mate/components/buttons.dart';
+import 'package:meet_mate/components/text_fields.dart';
+import '../utils/utils.dart';
 import 'tab_manager.dart';
 
 class CreateProfileView extends StatefulWidget {
   final String uid;
   const CreateProfileView({Key? key, required this.uid}) : super(key: key);
 
-  // pass the uid to the state
   @override
   State<CreateProfileView> createState() => _CreateProfileViewState(uid: uid);
 }
@@ -22,13 +24,14 @@ class _CreateProfileViewState extends State<CreateProfileView> {
   var interestsField = TextEditingController();
   var aboutMeField = TextEditingController();
   File? profileImage;
-  var colorPickImage = Colors.black;
+  var isImagePicked = true;
 
   _CreateProfileViewState({required this.uid});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffe87e70),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -44,29 +47,25 @@ class _CreateProfileViewState extends State<CreateProfileView> {
               else
                 Image.asset('assets/images/default_profile_image.png', height: 200, width: 200),
 
-              const SizedBox(height: 12),
-              Container(
-                width: 200,
-                child: ElevatedButton(
-                  onPressed: () {
-                    pickImageClicked();
-                  },
-                  child: const Text('Pick Image'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: colorPickImage,
-                    backgroundColor: Colors.grey[300],
-                  ),
-                ),
+              const SizedBox(height: 16),
+              ImageButton(
+                onPressed: pickImageClicked,
               ),
 
-              if (colorPickImage == Colors.red)
-                const Text('Please pick an image', style: TextStyle(color: Colors.red)),
+              if (!isImagePicked)
+                const Text('Please pick an image',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                ),
 
-              const SizedBox(height: 8),
-              // Name
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Name'),
+              const SizedBox(height: 16),
+
+              MainTextField(
                 controller: nameField,
+                labelText: 'Name',
                 validator: (value) {
                   if (nameField.text.isEmpty) {
                     return 'Please enter a valid name';
@@ -74,9 +73,28 @@ class _CreateProfileViewState extends State<CreateProfileView> {
                   return null;
                 },
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Birth Date'),
+                decoration: const InputDecoration(
+                    labelText: 'Birth Date',
+                    filled: true,
+                    fillColor: Colors.white,
+                    enabled: true,
+                    errorStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 15.0,
+                      horizontal: 20.0,
+                    ),
+                ),
                 controller: birthdateField,
                 validator: (value) {
                   if (birthdateField.text.isEmpty) {
@@ -98,11 +116,10 @@ class _CreateProfileViewState extends State<CreateProfileView> {
                 },
               ),
 
-              const SizedBox(height: 8),
-              // Interests
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Interests'),
+              const SizedBox(height: 16),
+              MainTextField(
                 controller: interestsField,
+                labelText: 'Interests',
                 validator: (value) {
                   if (interestsField.text.isEmpty) {
                     return 'Please enter valid interests';
@@ -110,30 +127,24 @@ class _CreateProfileViewState extends State<CreateProfileView> {
                   return null;
                 },
               ),
-              const SizedBox(height: 8),
-              // About Me
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                decoration: const InputDecoration(labelText: 'About Me'),
+
+              const SizedBox(height: 16),
+              MainTextField(
                 controller: aboutMeField,
+                labelText: 'About Me',
                 validator: (value) {
                   if (aboutMeField.text.isEmpty) {
-                    return 'Please enter valid information';
+                    return 'Please enter something about yourself';
                   }
                   return null;
                 },
+                isMultiline: true,
               ),
-              const SizedBox(height: 8),
-              // Finish Button
-              Container(
-                margin: const EdgeInsets.all(15),
-                width: 200,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: createProfileClicked,
-                  child: const Text('Create my profile'),
-                ),
+
+              const SizedBox(height: 16),
+              MainButton(
+                onPressed: createProfileClicked,
+                text: 'Create my profile',
               ),
             ],
           ),
@@ -143,70 +154,33 @@ class _CreateProfileViewState extends State<CreateProfileView> {
   }
 
   void pickImageClicked() async {
-    colorPickImage =  Colors.black;
-    // ask if the user wants to take a picture or choose from gallery
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text('Camera'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.camera);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library),
-                  title: const Text('Gallery'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.gallery);
-                  },
-                ),
-              ],
-            ),
-          );
-        }
-    );
-
-  }
-
-  void _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: source);
+    final pickedImage = await Utils.pickImage(context);
     if (pickedImage != null) {
       setState(() {
         profileImage = File(pickedImage.path);
+        isImagePicked = true;
       });
     }
   }
 
   void createProfileClicked () async {
     if (formKey.currentState!.validate() && profileImage != null) {
-      // Save image
       FirebaseStorage.instance.ref('profile_images/$uid').putFile(profileImage!);
 
-      // Save profile information
       FirebaseFirestore.instance.collection('users').doc(uid).set({
         'name': nameField.text,
         'birthdate': birthdateField.text,
         'interests': interestsField.text,
         'about_me': aboutMeField.text,
+      }).then((value) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TabManager(uid: uid)),
+        );
       });
-
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => TabManager(uid: uid)),
-      );
     } else if (profileImage == null) {
       setState(() {
-        colorPickImage = Colors.red;
+        isImagePicked = false;
       });
     }
   }

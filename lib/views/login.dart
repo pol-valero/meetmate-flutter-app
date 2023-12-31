@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'tab_manager.dart';
 import 'register.dart';
 import 'create_profile.dart';
+import 'package:meet_mate/components/buttons.dart';
+import 'package:meet_mate/components/text_fields.dart';
+import 'package:meet_mate/utils/utils.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -20,7 +23,11 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffe87e70),
       appBar: AppBar(
+        toolbarHeight: 100,
+        backgroundColor: const Color(0xffe87e70),
+        foregroundColor: Colors.white,
         title: const Text('Login'),
       ),
       body: Padding(
@@ -29,42 +36,44 @@ class _LoginViewState extends State<LoginView> {
           key: formKey,
           child: Column(
             children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Email'),
+              MainTextField(
                 controller: emailField,
+                labelText: 'Email',
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter your email';
+                  if (!Utils.checkEmail(emailField.text)) {
+                    return 'Please enter a valid email';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Password'),
+              MainTextField(
                 controller: passwordField,
-                obscureText: true,
+                labelText: 'Password',
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter your password';
                   }
                   return null;
                 },
+                obscureText: true,
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: loginButtonClicked,
-                child: const Text('Login'),
+              MainButton(
+                onPressed: () {
+                  loginButtonClicked();
+                },
+                text: 'Login',
               ),
               const SizedBox(height: 16),
-              TextButton(
+              NoBackgroundButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const RegisterView()),
                   );
                 },
-                child: const Text('Don\'t have an account? Register here'),
+                text: 'Don\'t have an account? Register here',
               ),
             ],
           ),
@@ -79,9 +88,6 @@ class _LoginViewState extends State<LoginView> {
           email: emailField.text,
           password: passwordField.text
       ).then((value) {
-        // check that the user has created a profile
-        // if not, redirect to create profile page
-
         FirebaseFirestore.instance.collection('users').doc(value.user!.uid).get().then((value) {
           if (value.exists) {
             Navigator.push(

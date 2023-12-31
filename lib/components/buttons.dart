@@ -1,4 +1,3 @@
-// In this file we will define the buttons on the app.
 import 'package:flutter/material.dart';
 
 class MainButton extends StatelessWidget {
@@ -56,6 +55,30 @@ class NoBackgroundButton extends StatelessWidget {
                     fontSize: 15,
                     color: Colors.white,
                 ),
+            ),
+        );
+    }
+}
+
+class ImageButton extends StatelessWidget {
+    final VoidCallback onPressed;
+
+    const ImageButton({
+        Key? key,
+        required this.onPressed,
+    }) : super(key: key);
+
+    @override
+    Widget build(BuildContext context) {
+        return Container(
+            width: 200,
+            child: ElevatedButton(
+                onPressed: onPressed,
+                style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.transparent,
+                ),
+                child: const Text('Pick Image'),
             ),
         );
     }

@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset('assets/images/logo_meetmate.png'),
-              const SizedBox(height: 20), // Add some spacing between the image and buttons
+              const SizedBox(height: 20),
               MainButton(
                   onPressed: () {
                     Navigator.push(
