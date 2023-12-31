@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'chat.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'tab_manager.dart';
 import 'register.dart';
+import 'create_profile.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -77,10 +79,22 @@ class _LoginViewState extends State<LoginView> {
           email: emailField.text,
           password: passwordField.text
       ).then((value) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ChatView()),
-        );
+        // check that the user has created a profile
+        // if not, redirect to create profile page
+
+        FirebaseFirestore.instance.collection('users').doc(value.user!.uid).get().then((value) {
+          if (value.exists) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TabManager(uid: value.id)),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CreateProfileView(uid: value.id)),
+            );
+          }
+        });
       }).catchError((error) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Email or password is incorrect")),
