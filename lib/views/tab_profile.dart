@@ -14,10 +14,11 @@ import '../utils/utils.dart';
 
 class TabProfileView extends StatefulWidget {
   final String uid;
-  const TabProfileView({Key? key, required this.uid}) : super(key: key);
+  final bool editProfileMode;
+  const TabProfileView({Key? key, required this.uid, required this.editProfileMode}) : super(key: key);
 
   @override
-  _TabProfileViewState createState() => _TabProfileViewState(uid: uid);
+  _TabProfileViewState createState() => _TabProfileViewState(uid: uid, editProfileMode: editProfileMode);
 
 }
 
@@ -33,9 +34,9 @@ class _TabProfileViewState extends State<TabProfileView> {
   String signOutText = 'Sign Out';
   bool editable = false;
   var formKey = GlobalKey<FormState>();
+  final bool editProfileMode; //If this is true, we will not show the appbar and we will show the buttons to edit and sign out
 
-
-  _TabProfileViewState({required this.uid});
+  _TabProfileViewState({required this.uid, required this.editProfileMode});
 
   @override
   void initState() {
@@ -55,6 +56,12 @@ class _TabProfileViewState extends State<TabProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: !editProfileMode ?
+      AppBar(
+        title: const Text('View Profile'),
+        centerTitle: true,
+        backgroundColor: const Color(0xffe87e70),
+      ) : null,
       backgroundColor: const Color(0xffe87e70),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -109,13 +116,13 @@ class _TabProfileViewState extends State<TabProfileView> {
                 isMultiline: true,
               ),
               const SizedBox(height:32),
-
-              MainButton(
+              if (editProfileMode)
+                MainButton(
                   onPressed: () {
                     if (editable && formKey.currentState!.validate()) {
                       saveProfileInfo();
                     }
-                    if(formKey.currentState!.validate()){
+                    if (formKey.currentState!.validate()) {
                       setState(() {
                         editable = !editable;
                         if (editable) {
@@ -127,13 +134,15 @@ class _TabProfileViewState extends State<TabProfileView> {
                     }
                   },
                   text: edit,
-              ),
-              MainButton(
-                onPressed: () {
-                  signOut();
-                },
-                text: signOutText,
-              )
+                ),
+                if (editProfileMode)
+                MainButton(
+                  onPressed: () {
+                    signOut();
+                  },
+                  text: signOutText,
+                )
+
             ],
           ),
         ),

@@ -22,7 +22,7 @@ class _TabManagerState extends State<TabManager> {
   void initState() {
     super.initState();
     viewToLoad = [
-      TabProfileView(uid: uid),
+      TabProfileView(uid: uid, editProfileMode: true),
       TabChatView(),
     ];
   }
