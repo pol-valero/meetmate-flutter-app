@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meet_mate/views/login.dart';
+import 'package:meet_mate/views/main.dart';
 import '../components/buttons.dart';
 import '../components/text_fields.dart';
 import '../utils/utils.dart';
@@ -28,6 +30,7 @@ class _TabProfileViewState extends State<TabProfileView> {
   var interestsField = TextEditingController();
   var aboutMeField = TextEditingController();
   String edit = 'Edit';
+  String signOutText = 'Sign Out';
   bool editable = false;
   var formKey = GlobalKey<FormState>();
 
@@ -40,6 +43,14 @@ class _TabProfileViewState extends State<TabProfileView> {
     getProfileInfo();
   }
 
+  Future signOut() async {
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MyApp()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +127,12 @@ class _TabProfileViewState extends State<TabProfileView> {
                     }
                   },
                   text: edit,
+              ),
+              MainButton(
+                onPressed: () {
+                  signOut();
+                },
+                text: signOutText,
               )
             ],
           ),

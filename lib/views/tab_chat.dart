@@ -1,6 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-//TODO: Do the class properly is only for testing purposes
 class TabChatView extends StatefulWidget {
   const TabChatView({Key? key}) : super(key: key);
 
@@ -10,11 +10,35 @@ class TabChatView extends StatefulWidget {
 
 class _TabChatViewState extends State<TabChatView> {
 
+  String userMail = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    getUserMail().then((value) {
+
+        setState(() {});
+    });
+
+  }
+
+  //Function to get the mail of the current logged user
+  Future getUserMail() async {
+    final user = FirebaseAuth.instance.currentUser;
+    userMail = user!.email!;
+    setState(() {
+    });
+  }
+
+  //TODO: Function getOtherUsers() to get the list of other users
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text('The CHAT are the friends we made along the way'),
+        child: Text(userMail),
       ),
     );
   }
