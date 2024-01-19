@@ -15,7 +15,7 @@ class TabChatView extends StatefulWidget {
 class _TabChatViewState extends State<TabChatView> {
 
   late User loggedUser;
-  late List<UserData> otherUsers;
+  late List<UserData> otherUsers = List.empty(growable: true);
 
   @override
   void initState() {
@@ -31,9 +31,6 @@ class _TabChatViewState extends State<TabChatView> {
   //Function to get the mail of the current logged user
   Future getUserMail() async {
     loggedUser = FirebaseAuth.instance.currentUser!;
-    //userMail = user!.email!;
-    setState(() {
-    });
   }
 
   Future getOtherUsers(User loggedUser) async {
@@ -46,6 +43,7 @@ class _TabChatViewState extends State<TabChatView> {
 
         await getUserDataFromUID(user.id).then((value) {
           otherUsers.add(value);
+          setState(() { });
         });
       }
     }
@@ -57,8 +55,7 @@ class _TabChatViewState extends State<TabChatView> {
     await FirebaseFirestore.instance.collection('users').doc(uid).get().then((value) async {
       userData.uid = uid;
       userData.name = value.get('name');
-      //TODO: UNCOMMENT
-      /*var birthdate = value.get('birthdate');
+      var birthdate = value.get('birthdate');
       userData.age = (DateTime
           .now()
           .difference(DateTime.parse(birthdate))
@@ -69,7 +66,7 @@ class _TabChatViewState extends State<TabChatView> {
       await FirebaseStorage.instance.ref().child('profile_images/$uid').getDownloadURL().then((value) async {
         userData.profileImage = Image.network(value, height: 200, width: 200);
       });
-      */
+
       return userData;
     });
 
@@ -80,8 +77,60 @@ class _TabChatViewState extends State<TabChatView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text(loggedUser.email!)
+      body: SafeArea(
+        child: ListView.builder(
+            itemCount: otherUsers.length,
+            itemBuilder: (context, index) {
+              return InkWell(
+                child: Container(
+                  height: 100,
+                  margin: const EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffe87e70),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              otherUsers[index].name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 15),
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: const Color(0xffe87e70),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: otherUsers[index].profileImage,
+                      ),
+                    ],
+                  ),
+                ),
+                onTap: () {
+                  /*Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RecipeInfoView(recipe: recipes[index]),
+                    ),
+                  );*/
+                },
+              );
+            }
+        ),
       ),
     );
   }
