@@ -7,7 +7,8 @@ import '../entities/user_data.dart';
 class ChatListContainer extends StatelessWidget {
 
   final UserData userData;
-  const ChatListContainer({Key? key, required this.userData}) : super(key: key);
+  final UserData loggedUserData;
+  const ChatListContainer({Key? key, required this.userData, required this.loggedUserData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +55,7 @@ class ChatListContainer extends StatelessWidget {
       onTap: () {
         Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => OpenChatView(userData: userData),
+                    MaterialPageRoute(builder: (context) => OpenChatView(userData: userData, loggedUserData: loggedUserData),
                     ),
                   );
       },

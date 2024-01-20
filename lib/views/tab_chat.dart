@@ -17,6 +17,7 @@ class _TabChatViewState extends State<TabChatView> {
 
   late User loggedUser;
   late List<UserData> otherUsers = List.empty(growable: true);
+  late final UserData loggedUserData;
 
   @override
   void initState() {
@@ -43,6 +44,11 @@ class _TabChatViewState extends State<TabChatView> {
           otherUsers.add(value);
           setState(() { });
         });
+      } else {
+          //We also use this function to get the data of the logged user
+          await getUserDataFromUID(user.id).then((value) {
+            loggedUserData = value;
+          });
       }
     }
   }
@@ -79,7 +85,7 @@ class _TabChatViewState extends State<TabChatView> {
         child: ListView.builder(
             itemCount: otherUsers.length,
             itemBuilder: (context, index) {
-              return ChatListContainer(userData: otherUsers[index]);
+              return ChatListContainer(userData: otherUsers[index], loggedUserData: loggedUserData);
             }
         ),
       ),
