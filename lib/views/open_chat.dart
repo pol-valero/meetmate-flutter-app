@@ -99,12 +99,23 @@ class _OpenChatViewState extends State<OpenChatView> {
 
   }
 
+  void disconnectUser() async {
+    await client.disconnectUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(this.userData.name),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            disconnectUser();
+            Navigator.of(context).pop(); // This line will pop the current route off the stack
+          },
+        ),
       bottom: PreferredSize(
       preferredSize: Size.fromHeight(30.0),
       child: TextButton(
@@ -128,7 +139,6 @@ class _OpenChatViewState extends State<OpenChatView> {
               child: ListView.builder(
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
-                  //return Text(messages[index].text!);
                   if (messages[index].user?.id == loggedUserData.uid) {
                     return ChatMessageLoggedUser(message: messages[index]);
                   } else {

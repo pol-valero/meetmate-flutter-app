@@ -15,12 +15,15 @@ class ChatMessageLoggedUser extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.only(left: 200, top: 20, right: 20),
-      color: const Color(0xffe87e70),
       child: Text(
         message.text!,
         style: TextStyle(
           color: Colors.white, // Text color
         ),
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xffe87e70),
+        borderRadius: BorderRadius.circular(15.0), // Set the border radius
       ),
     );
   }
@@ -39,12 +42,15 @@ class ChatMessageOtherUser extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.only(left: 20, top: 20, right: 200),
-      color: Colors.grey,
       child: Text(
         message.text!,
         style: TextStyle(
           color: Colors.white, // Text color
         ),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey,
+        borderRadius: BorderRadius.circular(15.0), // Set the border radius
       ),
     );
   }
