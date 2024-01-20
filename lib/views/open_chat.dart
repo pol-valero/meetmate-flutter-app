@@ -1,8 +1,8 @@
 
+import 'package:meet_mate/components/chat_message.dart';
 import 'package:meet_mate/views/tab_profile.dart';
 import 'package:stream_chat/stream_chat.dart';
 
-import '../components/text_fields.dart';
 import '../entities/user_data.dart';
 import 'package:flutter/material.dart';
 
@@ -18,14 +18,13 @@ class OpenChatView extends StatefulWidget {
 
 class _OpenChatViewState extends State<OpenChatView> {
 
-  final apiKey = "nxdbv8cgp2dk";
+  var apiKey = "nxdbv8cgp2dk";
+
   final UserData userData;  //Data of the user we are writing to
   final UserData loggedUserData; //Data of the current logged user
+  List<Message> messages = List.empty(growable: true);
 
-  final client = StreamChatClient(
-    "nxdbv8cgp2dk",
-    logLevel: Level.INFO,
-  );
+  late final client;
 
   late final channel;
 
@@ -41,6 +40,11 @@ class _OpenChatViewState extends State<OpenChatView> {
   }
 
   void initChat() async {
+
+    client = StreamChatClient(
+    apiKey, //API KEY
+    logLevel: Level.INFO,
+    );
 
     final user = User(id: userData.uid, extraData: {
       'name': userData.name,
@@ -65,23 +69,19 @@ class _OpenChatViewState extends State<OpenChatView> {
   }
 
   void loadMessages() async {
+
     var state = await channel.watch();
 
-    print("Mensajes canal: ");
+    messages = state.messages;
 
-    //for each message, we print it
-    for (var message in state.messages) {
-      print("Usuario: " + message.user.name);
-      print("Texto: " + message.text);
-      print("");
-    }
+    setState(() {
+    });
+
   }
 
   void sendMessage() async {
 
     if (messageField.text.isNotEmpty) {
-
-      var state = await channel.watch();
 
       final message = Message(text: messageField.text);
 
@@ -122,9 +122,20 @@ class _OpenChatViewState extends State<OpenChatView> {
       body: Column(
         children: [
 
-          const Expanded(
+           Expanded(
             child: Center(
-              child: Text('Message Display Area'),
+
+              child: ListView.builder(
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  //return Text(messages[index].text!);
+                  if (messages[index].user?.id == loggedUserData.uid) {
+                    return ChatMessageLoggedUser(message: messages[index]);
+                  } else {
+                    return ChatMessageOtherUser(message: messages[index]);
+                  }
+                },
+              ),
             ),
           ),
           Padding(
