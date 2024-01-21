@@ -17,17 +17,25 @@ class _TabChatViewState extends State<TabChatView> {
 
   late User loggedUser;
   late List<UserData> otherUsers = List.empty(growable: true);
-  late final UserData loggedUserData;
+  UserData loggedUserData = UserData();
 
   @override
   void initState() {
     super.initState();
 
     getUserMail().then((value) {
+      getCurrentUserData().then((value) {
         getOtherUsers(loggedUser);
         setState(() {});
+      });
     });
 
+  }
+
+  Future getCurrentUserData() async {
+    await getUserDataFromUID(loggedUser.uid).then((value) {
+      loggedUserData = value;
+    });
   }
 
   //Function to get the mail of the current logged user
@@ -44,11 +52,6 @@ class _TabChatViewState extends State<TabChatView> {
           otherUsers.add(value);
           setState(() { });
         });
-      } else {
-          //We also use this function to get the data of the logged user
-          await getUserDataFromUID(user.id).then((value) {
-            loggedUserData = value;
-          });
       }
     }
   }
