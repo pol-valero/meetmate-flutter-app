@@ -12,7 +12,7 @@ class TabManager extends StatefulWidget {
 }
 
 class _TabManagerState extends State<TabManager> {
-  int tabIndex = ;
+  int tabIndex = 0;
   final String uid;
   late List<Widget> viewToLoad;
 
