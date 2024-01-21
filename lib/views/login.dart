@@ -30,7 +30,7 @@ class _LoginViewState extends State<LoginView> {
         foregroundColor: Colors.white,
         title: const Text('Login'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: formKey,

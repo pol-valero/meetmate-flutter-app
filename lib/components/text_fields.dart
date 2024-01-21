@@ -26,6 +26,7 @@ class MainTextField extends StatelessWidget {
                 filled: true,
                 fillColor: Colors.white,
                 enabled: enabled,
+                errorMaxLines:3,
                 errorStyle: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

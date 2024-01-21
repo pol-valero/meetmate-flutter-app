@@ -12,7 +12,7 @@ class TabManager extends StatefulWidget {
 }
 
 class _TabManagerState extends State<TabManager> {
-  int tabIndex = 1;
+  int tabIndex = ;
   final String uid;
   late List<Widget> viewToLoad;
 
@@ -23,7 +23,7 @@ class _TabManagerState extends State<TabManager> {
     super.initState();
     viewToLoad = [
       TabProfileView(uid: uid, editProfileMode: true),
-      TabChatView(),
+      const TabChatView(),
     ];
   }
 
